@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock
  * Time: 11:44
  */
 object Log {
-    val lock: ReentrantLock = ReentrantLock(true)
+    private val lock: ReentrantLock = ReentrantLock(true)
     val logPanel = LogPanel()
 
     fun log(str: String){
