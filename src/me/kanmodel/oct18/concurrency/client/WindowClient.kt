@@ -58,7 +58,7 @@ class WindowClient {
 
         port = JTextField()
         port.setBounds(170, 8, 40, 30)
-        port.text = "30000"
+        port.text = "20018"
         window.add(port)
 
         val names = JLabel("ÓÃ»§Ãû:")

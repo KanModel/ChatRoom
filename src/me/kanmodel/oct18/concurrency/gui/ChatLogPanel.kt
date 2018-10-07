@@ -11,25 +11,34 @@ import javax.swing.*
 import javax.swing.border.TitledBorder
 
 class ChatLogPanel : JPanel() {
-    private val message = JTextArea()
+    private val message = JTextField()
     private val sendBtn = JButton("发送")
 
     init {
-        layout = BorderLayout()
+        layout = BorderLayout(5, 5)
 
         textMessage = JTextArea()
-//        textMessage.setBounds(135, 70, 340, 220)
         textMessage.border = TitledBorder("聊天记录")//设置标题
         textMessage.isEditable = false//不可编辑
         //文本内容换行的两个需要配合着用
         textMessage.lineWrap = true//设置文本内容自动换行，在超出文本区域时，可能会切断单词
         textMessage.wrapStyleWord = true//设置以自动换行，以单词为整体，保证单词不会被切断
-        add(BorderLayout.CENTER, JScrollPane(textMessage))
+        val textScrollPane = JScrollPane(textMessage)
+//        add(BorderLayout.CENTER, JScrollPane(textMessage))
 
         user = JList()
-        add(BorderLayout.WEST, JScrollPane(user))
+        user.border = TitledBorder("用户列表")
+        val userScrollPane = JScrollPane(user)
+//        add(BorderLayout.WEST, userScrollPane)
 
-        val panel = JPanel(BorderLayout())
+        val chatSpiltPane = JSplitPane()
+        chatSpiltPane.leftComponent = userScrollPane
+        chatSpiltPane.rightComponent = textScrollPane
+        chatSpiltPane.isOneTouchExpandable = true
+        chatSpiltPane.dividerLocation = 150
+        add(chatSpiltPane)
+
+        val messagePanel = JPanel(BorderLayout())
         //按回车发送消息
         message.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent?) {
@@ -38,13 +47,19 @@ class ChatLogPanel : JPanel() {
                 }
             }
         })
-        panel.add(BorderLayout.CENTER, message)
-        //点击按钮发送消息
-        sendBtn.addActionListener { sendMsg() }
-        panel.add(BorderLayout.EAST, sendBtn)
-        add(BorderLayout.SOUTH, panel)
+        messagePanel.add(BorderLayout.CENTER, message)
+        sendBtn.addActionListener { sendMsg() }//点击按钮发送消息
+        messagePanel.add(BorderLayout.EAST, sendBtn)
+        add(BorderLayout.SOUTH, messagePanel)
+
+/*        val splitPane = JSplitPane(JSplitPane.VERTICAL_SPLIT)
+        splitPane.topComponent = chatSpiltPane
+        splitPane.bottomComponent = messagePanel
+        chatSpiltPane.dividerLocation = 100
+        add(splitPane)*/
     }
 
+    //发送信息
     fun sendMsg() {
         val messages = message.text
         //判断内容是否为空
@@ -58,7 +73,7 @@ class ChatLogPanel : JPanel() {
                 SendServer(StartServer.userList!!, getServerName() + "：" + messages, 1.toString() + "")
                 //将信息添加到客户端聊天记录中
                 textMessage.append(getServerName() + "：" + messages + "\r\n")
-                message.text = ""//消息框设置为空
+                message.text = null//消息框设置为空
             } catch (e1: IOException) {
                 JOptionPane.showMessageDialog(Main.mainFrame, "发送失败！")
             }

@@ -4,6 +4,7 @@ import me.kanmodel.oct18.concurrency.Log
 import me.kanmodel.oct18.concurrency.Main
 import me.kanmodel.oct18.concurrency.server.SendServer
 import me.kanmodel.oct18.concurrency.server.StartServer
+import java.awt.Dimension
 import java.io.IOException
 import javax.swing.*
 
@@ -30,21 +31,9 @@ class OptionPanel : JPanel() {
             Log.log("点击按钮btn点击按钮btn点击按钮btn点击按钮btn点击按钮btn点击按钮btn点击按钮btn点击按钮btn")
         }
 
-/*        resizeToggleBtn.addChangeListener{
-            val btn = it.source as JToggleButton
-            Log.log("${btn.text} is selected? ${btn.isSelected}")
-            if (btn.isSelected) {
-                btn.text = "调整大小: 开"
-                Main.mainFrame.isResizable = true
-            } else {
-                btn.text = "调整大小: 关"
-                Main.mainFrame.isResizable = false
-            }
-        }*/
-
         resizeToggleBtn.addActionListener {
             val btn = it.source as JToggleButton
-            Log.log("${btn.text} is selected? ${btn.isSelected}")
+            Log.log("窗口调整属性设置为 ${btn.isSelected}")
             if (btn.isSelected) {
                 btn.text = "调整大小: 开"
                 Main.mainFrame.isResizable = true
@@ -56,7 +45,6 @@ class OptionPanel : JPanel() {
 
         serverToggleBtn.addActionListener {
             val btn = it.source as JToggleButton
-//            Log.log("${btn.text} is selected? ${btn.isSelected}")
             if (btn.isSelected) {
                 btn.text = "服务器: 开"
 
@@ -71,17 +59,6 @@ class OptionPanel : JPanel() {
                         Log.log("服务器启动失败")
                     }
                 }
-/*                ports = port//获取端口号
-                if (ports != 0) {
-                    try {
-                        StartServer.flag = true//改变服务端接收循环标记
-                        Thread(StartServer(ports)).start() //开启服务端接收线程
-                        start.text = "已启动"
-                        exit.text = "关闭"
-                    } catch (e1: IOException) {
-                        JOptionPane.showMessageDialog(window, "启动失败")
-                    }
-                }*/
             } else {
                 btn.text = "服务器: 关"
 
@@ -112,21 +89,29 @@ class OptionPanel : JPanel() {
         hBox2.add(resizeToggleBtn)
 
         val hBox3 = Box.createHorizontalBox()
-        hBox3.add(JLabel("IP:"))
+        hBox3.add(JLabel(" IP :   "))
         ipText = JTextField("127.0.0.1")
-        ipText.horizontalAlignment = JTextField.CENTER
+        ipText.horizontalAlignment = JTextField.RIGHT
+        ipText.maximumSize = Dimension(400, 30)
+        ipText.minimumSize = Dimension(400, 30)
         hBox3.add(ipText)
 
         val hBox4 = Box.createHorizontalBox()
         hBox4.add(JLabel("Port:"))
+//        hBox4.add(Box.createHorizontalStrut(200))
         portText = JTextField("20018")
-        portText.horizontalAlignment = JTextField.CENTER
+        portText.horizontalAlignment = JTextField.RIGHT
+        portText.maximumSize = Dimension(400, 30)
+        portText.minimumSize = Dimension(400, 30)
         hBox4.add(portText)
 
         val hBox5 = Box.createHorizontalBox()
         hBox5.add(JLabel("名字:"))
+//        hBox5.add(Box.createHorizontalStrut(200))
         serverName = JTextField("服务端")
-        serverName.horizontalAlignment = JTextField.CENTER
+        serverName.horizontalAlignment = JTextField.RIGHT
+        serverName.maximumSize = Dimension(400, 30)
+        serverName.minimumSize = Dimension(400, 30)
         hBox5.add(serverName)
 
         val hBox6 = Box.createHorizontalBox()
@@ -135,12 +120,19 @@ class OptionPanel : JPanel() {
         val hBoxl = Box.createHorizontalBox()
         hBoxl.add(JLabel("KanModel@2018"))
 
-        add(hBox1)
+//        add(Box.createVerticalStrut(5))
+//        add(hBox1)
+        add(Box.createVerticalStrut(5))
         add(hBox2)
+        add(Box.createVerticalStrut(5))
         add(hBox3)
+        add(Box.createVerticalStrut(5))
         add(hBox4)
+        add(Box.createVerticalStrut(5))
         add(hBox5)
+        add(Box.createVerticalStrut(5))
         add(hBox6)
+        add(Box.createVerticalGlue())
         add(hBoxl)
     }
 

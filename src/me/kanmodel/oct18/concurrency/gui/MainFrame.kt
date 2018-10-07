@@ -26,16 +26,6 @@ class MainFrame(private val myTitle: String = "操作系统-三级项目") : JFrame(myTi
         isResizable = false
         setLocationRelativeTo(null)
 
-/*        addMouseListener(object : MouseAdapter(){
-            override fun mouseEntered(e: MouseEvent?) {
-                Log.log("欢迎回来")
-            }
-
-            override fun mouseExited(e: MouseEvent?) {
-                Log.log("Exit")
-            }
-        })*/
-
         contentPane = MainPanel()
 
         addWindowListener(object : WindowAdapter() {

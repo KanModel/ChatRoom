@@ -20,23 +20,16 @@ import javax.swing.*
 class MainPanel : JPanel() {
     init {
         val mLayout = BoxLayout(this, BoxLayout.X_AXIS)
-//        layout = BorderLayout()
         layout = mLayout
 
         background = Color.gray
 
         val tabbedPanel = TabbedPanel()
-//        tabbedPanel.border = BorderFactory.createRaisedSoftBevelBorder()
-
-//        val rigidArea = Box.createRigidArea(Dimension(200, 600))
-
-
-//        add(label1)
-//        add(BorderLayout.CENTER, tabbedPanel)
-//        add(BorderLayout.EAST, Log.logPanel)
         add(tabbedPanel)
+        Log.log("选项面板加载完毕")
         add(Log.logPanel)
+        Log.log("Log面板加载完毕")
 
-        Log.log("gg")
+        Log.log("各组件面板加载完毕")
     }
 }
