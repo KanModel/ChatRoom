@@ -48,6 +48,9 @@ class OptionPanel : JPanel() {
             if (btn.isSelected) {
                 btn.text = "服务器: 开"
 
+                ipText.isEditable = false
+                portText.isEditable = false
+                serverName.isEditable = false
                 serverPort = port
                 if (serverPort != 0) {
                     try {
@@ -62,9 +65,12 @@ class OptionPanel : JPanel() {
             } else {
                 btn.text = "服务器: 关"
 
-                if (StartServer.userList != null && StartServer.userList!!.size != 0) {
+                ipText.isEditable = true
+                portText.isEditable = true
+                serverName.isEditable = true
+                if (StartServer.userSocketList != null && StartServer.userSocketList!!.size != 0) {
                     try {
-                        SendServer(StartServer.userList!!, "", 4.toString() + "")
+                        SendServer("", 4.toString() + "")
                     } catch (e1: IOException) {
                         e1.printStackTrace()
                     }
@@ -72,7 +78,9 @@ class OptionPanel : JPanel() {
                 try {
                     StartServer.serverSocket!!.close()//关闭服务端
                     StartServer.serverSocket = null
-                    StartServer.userList = null
+//                    StartServer.userSocketList = null
+                    StartServer.userSocketList.clear()
+                    StartServer.userNames.clear()
                     StartServer.flag = false//改变服务端循环标记
                     Log.log("服务器关闭")
                 } catch (e1: IOException) {

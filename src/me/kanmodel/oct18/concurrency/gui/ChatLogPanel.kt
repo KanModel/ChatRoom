@@ -1,12 +1,15 @@
 package me.kanmodel.oct18.concurrency.gui
 
+import me.kanmodel.oct18.concurrency.Log
 import me.kanmodel.oct18.concurrency.Main
+import me.kanmodel.oct18.concurrency.server.ReceiveServer
 import me.kanmodel.oct18.concurrency.server.SendServer
 import me.kanmodel.oct18.concurrency.server.StartServer
 import java.awt.BorderLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.io.IOException
+import java.lang.Exception
 import javax.swing.*
 import javax.swing.border.TitledBorder
 
@@ -26,9 +29,9 @@ class ChatLogPanel : JPanel() {
         val textScrollPane = JScrollPane(textMessage)
 //        add(BorderLayout.CENTER, JScrollPane(textMessage))
 
-        user = JList()
-        user.border = TitledBorder("用户列表")
-        val userScrollPane = JScrollPane(user)
+        userList = JList()
+        userList.border = TitledBorder("用户列表")
+        val userScrollPane = JScrollPane(userList)
 //        add(BorderLayout.WEST, userScrollPane)
 
         val chatSpiltPane = JSplitPane()
@@ -65,14 +68,24 @@ class ChatLogPanel : JPanel() {
         //判断内容是否为空
         if (messages == "") {
             JOptionPane.showMessageDialog(Main.mainFrame, "内容不能为空！")
-        } else if (StartServer.userList == null || StartServer.userList!!.size == 0) {//判断是否已经连接成功
+        } else if (StartServer.userSocketList == null || StartServer.userSocketList!!.size == 0) {//判断是否已经连接成功
             JOptionPane.showMessageDialog(Main.mainFrame, "未连接成功，不能发送消息！")
         } else {
             try {
                 //将信息发送给所有客户端
-                SendServer(StartServer.userList!!, getServerName() + "：" + messages, 1.toString() + "")
-                //将信息添加到客户端聊天记录中
-                textMessage.append(getServerName() + "：" + messages + "\r\n")
+                SendServer(getServerName() + "：" + messages, 1.toString() + "")
+
+                Log.log("服务端 尝试获取锁")
+                ReceiveServer.chatLogSem.acquire()
+                try {
+                    //将信息添加到客户端聊天记录中
+                    textMessage.append(getServerName() + "：" + messages + "\r\n")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }finally {
+                    ReceiveServer.chatLogSem.release()
+                    Log.log("服务端 释放锁")
+                }
                 message.text = null//消息框设置为空
             } catch (e1: IOException) {
                 JOptionPane.showMessageDialog(Main.mainFrame, "发送失败！")
@@ -88,6 +101,6 @@ class ChatLogPanel : JPanel() {
 
     companion object {
         lateinit var textMessage: JTextArea//聊天记录
-        lateinit var user: JList<String>//用户列表
+        lateinit var userList: JList<String>//用户列表
     }
 }

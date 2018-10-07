@@ -1,13 +1,11 @@
 package me.kanmodel.oct18.concurrency.gui
 
-import me.kanmodel.oct18.concurrency.Log
 import me.kanmodel.oct18.concurrency.server.SendServer
 import me.kanmodel.oct18.concurrency.server.StartServer
 import java.awt.Dimension
 import java.awt.event.*
 import java.io.IOException
 import javax.swing.JFrame
-import javax.swing.SpringLayout
 import javax.swing.WindowConstants
 
 /**
@@ -32,9 +30,9 @@ class MainFrame(private val myTitle: String = "操作系统-三级项目") : JFrame(myTi
             //关闭窗体
             override fun windowClosing(e: WindowEvent?) {
                 //如果有客户端存在，发信息给客户端，并退出
-                if (StartServer.userList != null && StartServer.userList!!.size != 0) {
+                if (StartServer.userSocketList != null && StartServer.userSocketList!!.size != 0) {
                     try {
-                        SendServer(StartServer.userList!!, "", "4")//4代表服务端退出
+                        SendServer("", "4")//4代表服务端退出
                     } catch (e1: IOException) {
                         e1.printStackTrace()
                     }
