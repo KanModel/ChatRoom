@@ -75,7 +75,7 @@ class ChatLogPanel : JPanel() {
                 //将信息发送给所有客户端
                 SendServer(getServerName() + "：" + messages, 1.toString() + "")
 
-                Log.log("服务端 尝试获取锁")
+                Log.log("服务端 尝试获取chatLog锁")
                 ReceiveServer.chatLogSem.acquire()
                 try {
                     //将信息添加到客户端聊天记录中
@@ -84,7 +84,7 @@ class ChatLogPanel : JPanel() {
                     e.printStackTrace()
                 }finally {
                     ReceiveServer.chatLogSem.release()
-                    Log.log("服务端 释放锁")
+                    Log.log("服务端 释放chatLog锁")
                 }
                 message.text = null//消息框设置为空
             } catch (e1: IOException) {

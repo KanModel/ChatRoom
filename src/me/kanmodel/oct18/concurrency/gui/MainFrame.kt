@@ -15,7 +15,7 @@ import javax.swing.WindowConstants
  * Date: 2018-09-29
  * Time: 11:01
  */
-class MainFrame(private val myTitle: String = "操作系统-三级项目") : JFrame(myTitle) {
+class MainFrame(private val myTitle: String = "OS-聊天室") : JFrame(myTitle) {
 
     init {
         defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
