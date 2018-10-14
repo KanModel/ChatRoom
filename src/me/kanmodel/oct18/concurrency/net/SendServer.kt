@@ -1,9 +1,7 @@
-package me.kanmodel.oct18.concurrency.server
+package me.kanmodel.oct18.concurrency.net
 
 import java.io.IOException
 import java.io.PrintWriter
-import java.net.Socket
-import java.util.ArrayList
 
 /**
  * 服务端发送信息

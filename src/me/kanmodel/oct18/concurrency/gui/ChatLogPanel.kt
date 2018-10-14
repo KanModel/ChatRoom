@@ -2,9 +2,9 @@ package me.kanmodel.oct18.concurrency.gui
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main
-import me.kanmodel.oct18.concurrency.server.ReceiveServer
-import me.kanmodel.oct18.concurrency.server.SendServer
-import me.kanmodel.oct18.concurrency.server.StartServer
+import me.kanmodel.oct18.concurrency.net.ReceiveServer
+import me.kanmodel.oct18.concurrency.net.SendServer
+import me.kanmodel.oct18.concurrency.net.StartServer
 import java.awt.BorderLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent

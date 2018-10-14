@@ -1,4 +1,4 @@
-package me.kanmodel.oct18.concurrency.server
+package me.kanmodel.oct18.concurrency.net
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main

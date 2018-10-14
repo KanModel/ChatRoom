@@ -2,8 +2,8 @@ package me.kanmodel.oct18.concurrency.gui
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main
-import me.kanmodel.oct18.concurrency.server.SendServer
-import me.kanmodel.oct18.concurrency.server.StartServer
+import me.kanmodel.oct18.concurrency.net.SendServer
+import me.kanmodel.oct18.concurrency.net.StartServer
 import java.awt.Dimension
 import java.io.IOException
 import javax.swing.*
