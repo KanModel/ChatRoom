@@ -1,6 +1,6 @@
 package me.kanmodel.oct18.concurrency.gui
 
-import me.kanmodel.oct18.concurrency.Log
+import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main
 import me.kanmodel.oct18.concurrency.server.ReceiveServer
 import me.kanmodel.oct18.concurrency.server.SendServer

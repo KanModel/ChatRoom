@@ -1,4 +1,4 @@
-package me.kanmodel.oct18.concurrency
+package me.kanmodel.oct18.concurrency.util
 
 import me.kanmodel.oct18.concurrency.gui.LogPanel
 import java.lang.Exception

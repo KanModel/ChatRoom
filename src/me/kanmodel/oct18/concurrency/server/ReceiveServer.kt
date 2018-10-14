@@ -1,6 +1,6 @@
 package me.kanmodel.oct18.concurrency.server
 
-import me.kanmodel.oct18.concurrency.Log
+import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.gui.ChatLogPanel
 import java.io.BufferedReader
 import java.io.IOException
@@ -40,8 +40,7 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                         try {
                             Log.log("用户 $clientName 得到chatLog锁")
                             ChatLogPanel.textMessage.append(line + "\r\n")//将信息添加到服务端聊天记录中
-                            //设置消息显示最新一行，也就是滚动条出现在末尾，显示最新一条输入的信息
-                            ChatLogPanel.textMessage.caretPosition = ChatLogPanel.textMessage.text.length
+                            ChatLogPanel.textMessage.caretPosition = ChatLogPanel.textMessage.text.length//设置消息显示最新一行，也就是滚动条出现在末尾，显示最新一条输入的信息
                             Log.log("用户 $clientName 发送信息")
 
 //                        socketListSem.acquire()

@@ -1,6 +1,6 @@
 package me.kanmodel.oct18.concurrency.server
 
-import me.kanmodel.oct18.concurrency.Log
+import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main
 import java.io.IOException
 import java.net.ServerSocket

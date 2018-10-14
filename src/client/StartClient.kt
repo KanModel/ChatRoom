@@ -1,4 +1,4 @@
-package me.kanmodel.oct18.concurrency.client
+package client
 
 /**
  * Created with IntelliJ IDEA.
