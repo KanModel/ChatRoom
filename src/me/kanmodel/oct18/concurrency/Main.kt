@@ -4,9 +4,8 @@ import me.kanmodel.oct18.concurrency.gui.MainFrame
 import javax.swing.SwingUtilities
 
 /**
- * Created with IntelliJ IDEA.
- * Description:
- * User: kgdwhsk
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Author: KanModel
  * Date: 2018-09-29
  * Time: 10:59
  */
