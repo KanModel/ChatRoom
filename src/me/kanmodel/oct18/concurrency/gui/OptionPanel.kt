@@ -68,7 +68,7 @@ class OptionPanel : JPanel() {
                 ipText.isEditable = true
                 portText.isEditable = true
                 serverName.isEditable = true
-                if (StartServer.userSocketList != null && StartServer.userSocketList!!.size != 0) {
+                if (StartServer.userSocketList != null && StartServer.userSocketList.size != 0) {
                     try {
                         SendServer("", 4.toString() + "")
                     } catch (e1: IOException) {

@@ -2,6 +2,7 @@ package me.kanmodel.oct18.concurrency.net
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main
+import me.kanmodel.oct18.concurrency.gui.ChatLogPanel
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
@@ -31,14 +32,14 @@ constructor(private val port: Int) : Runnable {
             try {
                 s = serverSocket!!.accept()//接收客户端
 
-                Log.log("服务端 尝试获取socket锁")
+                Log.log("服务端线程 尝试获取socket锁")
                 ReceiveServer.socketListSem.acquire()
                 try {
-                    Log.log("服务端 得到socket锁")
+                    Log.log("服务端线程 得到socket锁")
                     userSocketList.add(s)//将客户端的socket添加到容器中
                 } finally {
                     ReceiveServer.socketListSem.release()
-                    Log.log("服务端 释放socket锁")
+                    Log.log("服务端线程 释放socket锁")
                 }
 
                 //打印客户端信息
@@ -46,9 +47,14 @@ constructor(private val port: Int) : Runnable {
                 Log.log("$id 连接，当前客户端个数为：" + userSocketList.size)
 
                 //启动与客户端相对应的信息接收线程
-                Log.log("启动信息接受线程")
-//                Thread(ReceiveServer(s, userSocketList!!, userNames!!)).start()
+                Log.log("为该客户端启动信息接受线程")
                 Thread(ReceiveServer(s)).start()
+//                var chatHistory = ""
+                for (info in ChatLogPanel.chatLogger) {
+//                    chatHistory += "$info\r\n"
+                    SendServer(s, info,"1")//发送聊天记录
+                    Thread.sleep(10)
+                }
 
             } catch (e: IOException) {
                 JOptionPane.showMessageDialog(Main.mainFrame, "服务端退出！")

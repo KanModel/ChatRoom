@@ -2,13 +2,17 @@ package me.kanmodel.oct18.concurrency.net
 
 import java.io.IOException
 import java.io.PrintWriter
+import java.net.Socket
 
 /**
- * 服务端发送信息
+ * description: 给所有客户端发送数据（标记+信息）
+ * @param message 信息
+ * @param info 标记
  */
 class SendServer @Throws(IOException::class)
-constructor(message: Any, info: String) {
-    init {
+constructor() {
+
+    constructor(message: Any, info: String) : this() {
         val messages = info + message//添加信息头标记
         var pwOut: PrintWriter? = null
 
@@ -18,7 +22,19 @@ constructor(message: Any, info: String) {
                 pwOut = PrintWriter(s.getOutputStream(), true)
                 pwOut.println(messages)
             }
-        }finally {
+        } finally {
+//            ReceiveServer.socketListSem.release()
+        }
+    }
+
+    constructor(socket: Socket, message: Any, info: String) : this() {
+        val messages = info + message//添加信息头标记
+
+//        ReceiveServer.socketListSem.acquire()
+        try {
+            val pwOut = PrintWriter(socket.getOutputStream(), true)
+            pwOut.println(messages)
+        } finally {
 //            ReceiveServer.socketListSem.release()
         }
     }

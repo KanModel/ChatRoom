@@ -2,6 +2,7 @@ package me.kanmodel.oct18.concurrency.gui
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main
+import me.kanmodel.oct18.concurrency.net.LockerManager.CHAT_LOCKER
 import me.kanmodel.oct18.concurrency.net.ReceiveServer
 import me.kanmodel.oct18.concurrency.net.SendServer
 import me.kanmodel.oct18.concurrency.net.StartServer
@@ -10,6 +11,8 @@ import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.io.IOException
 import java.lang.Exception
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.swing.*
 import javax.swing.border.TitledBorder
 
@@ -68,23 +71,26 @@ class ChatLogPanel : JPanel() {
         //判断内容是否为空
         if (messages == "") {
             JOptionPane.showMessageDialog(Main.mainFrame, "内容不能为空！")
-        } else if (StartServer.userSocketList == null || StartServer.userSocketList!!.size == 0) {//判断是否已经连接成功
+        } else if (StartServer.userSocketList.size == 0) {//判断是否已经连接成功
             JOptionPane.showMessageDialog(Main.mainFrame, "未连接成功，不能发送消息！")
         } else {
             try {
                 //将信息发送给所有客户端
-                SendServer(getServerName() + "：" + messages, 1.toString() + "")
+//                SendServer(getServerName() + "：" + messages, 1.toString() + "")
+                val line = "${SimpleDateFormat("HH:mm:ss").format(Date())} [${getServerName()}]:$messages"
+                SendServer(line, 1.toString() + "")
 
-                Log.log("服务端 尝试获取chatLog锁")
+                Log.log("服务端线程 尝试获取$CHAT_LOCKER")
                 ReceiveServer.chatLogSem.acquire()
                 try {
                     //将信息添加到客户端聊天记录中
-                    textMessage.append(getServerName() + "：" + messages + "\r\n")
+                    textMessage.append("$line\r\n")
+                    chatLogger.add(line)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }finally {
                     ReceiveServer.chatLogSem.release()
-                    Log.log("服务端 释放chatLog锁")
+                    Log.log("服务端线程 释放$CHAT_LOCKER")
                 }
                 message.text = null//消息框设置为空
             } catch (e1: IOException) {
@@ -100,7 +106,8 @@ class ChatLogPanel : JPanel() {
     }
 
     companion object {
-        lateinit var textMessage: JTextArea//聊天记录
+        val chatLogger = ArrayList<String>()//聊天记录
+        lateinit var textMessage: JTextArea//聊天记录文本区域
         lateinit var userList: JList<String>//用户列表
     }
 }

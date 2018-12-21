@@ -13,6 +13,8 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.IOException
 import java.net.Socket
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -78,24 +80,25 @@ class WindowClient {
         exit.setBounds(415, 8, 75, 30)
         window.add(exit)
 
-        val label2 = JLabel("用户列表")
-        label2.setBounds(40, 40, 80, 30)
-        window.add(label2)
+//        val label2 = JLabel("用户列表")
+//        label2.setBounds(40, 40, 80, 30)
+//        window.add(label2)
 
         user = JList()
+        user.border = TitledBorder("用户列表")
         val scrollPane = JScrollPane(user)//设置滚动条
-        scrollPane.setBounds(10, 70, 120, 220)
+        scrollPane.setBounds(10, 50, 120, 240)
         window.add(scrollPane)
 
         textMessage = JTextArea()
-        textMessage.setBounds(135, 70, 340, 220)
+        textMessage.setBounds(135, 50, 340, 240)
         textMessage.isEditable = false//文本不可编辑
         textMessage.border = TitledBorder("聊天记录")//设置标题
         //文本内容换行的两个需要配合着用
         textMessage.lineWrap = true//设置文本内容自动换行，在超出文本区域时，可能会切断单词
         textMessage.wrapStyleWord = true//设置以自动换行，以单词为整体，保证单词不会被切断
         val scrollPane1 = JScrollPane(textMessage)//设置滚动条
-        scrollPane1.setBounds(135, 70, 340, 220)
+        scrollPane1.setBounds(135, 50, 340, 240)
         window.add(scrollPane1)
 
         message = JTextField()
@@ -166,11 +169,12 @@ class WindowClient {
                         link.text = "已连接"//更改button显示信息
                         exit.text = "退出"
                         SendClient(socket!!, getName(), "2")//发送该客户端名称至服务器
-                        Thread(ReceiveClient(socket!!)).start()//启动接收线程
+//                        Thread(ReceiveClient(socket!!)).start()//启动接收线程
+                        StartClient(socket!!)//启动接收线程
+                        textMessage.text = ""
                     } catch (e2: Exception) {
                         JOptionPane.showMessageDialog(window, "连接未成功！可能是ip或端口号格式不对，或服务器未开启。")
                     }
-
                 }
             }
         }
@@ -198,7 +202,7 @@ class WindowClient {
         } else {
             try {
                 //发送信息
-                SendClient(socket!!, getName() + "：" + messages, "1")
+                SendClient(socket!!, "${SimpleDateFormat("HH:mm:ss").format(Date())} [${getName()}]:$messages", "1")
                 message.text = null//文本框内容设置为空
             } catch (e1: IOException) {
                 JOptionPane.showMessageDialog(window, "信息发送失败！")

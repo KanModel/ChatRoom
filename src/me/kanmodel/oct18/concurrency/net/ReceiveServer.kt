@@ -2,6 +2,7 @@ package me.kanmodel.oct18.concurrency.net
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.gui.ChatLogPanel
+import me.kanmodel.oct18.concurrency.net.LockerManager.CHAT_LOCKER
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -32,16 +33,17 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                 when (info) {//1代表收到的是信息
                     '1' -> {
                         if (clientName == "") {
-                            Log.log("对新用户尝试获取chatLog锁")
+                            Log.log("对新用户尝试获取$CHAT_LOCKER")
                         } else {
-                            Log.log("用户 $clientName 尝试获取chatLog锁")
+                            Log.log("线程 $clientName 尝试获取$CHAT_LOCKER")
                         }
                         chatLogSem.acquire()
                         try {
-                            Log.log("用户 $clientName 得到chatLog锁")
+                            Log.log("线程 $clientName 得到$CHAT_LOCKER")
                             ChatLogPanel.textMessage.append(line + "\r\n")//将信息添加到服务端聊天记录中
+                            ChatLogPanel.chatLogger.add(line)
                             ChatLogPanel.textMessage.caretPosition = ChatLogPanel.textMessage.text.length//设置消息显示最新一行，也就是滚动条出现在末尾，显示最新一条输入的信息
-                            Log.log("用户 $clientName 发送信息")
+                            Log.log("线程 $clientName 发送信息")
 
 //                        socketListSem.acquire()
 //                        try {
@@ -54,7 +56,7 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                             e.printStackTrace()
                         } finally {
                             chatLogSem.release()
-                            Log.log("用户 $clientName 释放chatLog锁")
+                            Log.log("线程 $clientName 释放$CHAT_LOCKER")
                         }
                     }
                     '2' -> {//2代表有新客户端建立连接
@@ -62,22 +64,22 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                         clientName = line
                         Log.log("与 $clientName 建立连接")
 
-                        Log.log("用户 $clientName 尝试获取name锁")
+                        Log.log("线程 $clientName 尝试获取name锁")
                         nameListSem.acquire()
                         socketListSem.acquire()
                         try {
-                            Log.log("用户 $clientName 得到name锁")
+                            Log.log("线程 $clientName 得到name锁")
                             StartServer.userNames.add(line)//将新客户端用户名添加到容器中
                             ChatLogPanel.userList.setListData(StartServer.userNames)//更新服务端用户列表
                             SendServer(StartServer.userNames, "2")//将用户列表以字符串的形式发给客户端
                         } finally {
-                            nameListSem.release()
                             socketListSem.release()
-                            Log.log("用户 $clientName 释放name锁")
+                            nameListSem.release()
+                            Log.log("线程 $clientName 释放name锁")
                         }
                     }
                     '3' -> {//3代表有用户端退出连接
-                        Log.log("用户 $line 退出聊天")
+                        Log.log("线程 $line 退出聊天")
 
                         nameListSem.acquire()
                         socketListSem.acquire()
@@ -96,11 +98,10 @@ class ReceiveServer(private val socket: Socket) : Runnable {
 //                    flag = false
                     }
                 }
-
             }
-            Log.log("用户 $clientName 断开连接")
+            Log.log("线程 $clientName 作业完毕")
         } catch (e: InterruptedException) {
-            Log.log("用户 $clientName 中断")
+            Log.log("线程 $clientName 中断退出")
         } catch (e: IOException) {
             e.printStackTrace()
         }
