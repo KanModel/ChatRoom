@@ -15,14 +15,7 @@ import java.io.IOException
 import java.net.Socket
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.swing.JButton
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.JList
-import javax.swing.JOptionPane
-import javax.swing.JScrollPane
-import javax.swing.JTextArea
-import javax.swing.JTextField
+import javax.swing.*
 import javax.swing.border.TitledBorder
 
 class WindowClient {
@@ -227,7 +220,9 @@ class WindowClient {
         //主函数入口
         @JvmStatic
         fun main(args: Array<String>) {
-            WindowClient()
+            SwingUtilities.invokeLater {
+                WindowClient()
+            }
         }
     }
 }

@@ -68,7 +68,7 @@ class OptionPanel : JPanel() {
                 ipText.isEditable = true
                 portText.isEditable = true
                 serverName.isEditable = true
-                if (StartServer.userSocketList != null && StartServer.userSocketList.size != 0) {
+                if (StartServer.userSockets.size != 0) {
                     try {
                         SendServer("", 4.toString() + "")
                     } catch (e1: IOException) {
@@ -78,8 +78,7 @@ class OptionPanel : JPanel() {
                 try {
                     StartServer.serverSocket!!.close()//关闭服务端
                     StartServer.serverSocket = null
-//                    StartServer.userSocketList = null
-                    StartServer.userSocketList.clear()
+                    StartServer.userSockets.clear()
                     StartServer.userNames.clear()
                     StartServer.flag = false//改变服务端循环标记
                     Log.log("服务器关闭")

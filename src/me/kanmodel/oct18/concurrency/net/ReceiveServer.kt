@@ -2,7 +2,11 @@ package me.kanmodel.oct18.concurrency.net
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.gui.ChatLogPanel
-import me.kanmodel.oct18.concurrency.net.LockerManager.CHAT_LOCKER
+import me.kanmodel.oct18.concurrency.net.DataManager.CHAT_LOCKER
+import me.kanmodel.oct18.concurrency.net.DataManager.chatHistories
+import me.kanmodel.oct18.concurrency.net.DataManager.chatMutex
+import me.kanmodel.oct18.concurrency.net.DataManager.chatQueue
+import me.kanmodel.oct18.concurrency.net.DataManager.notEmpty
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -19,7 +23,7 @@ class ReceiveServer(private val socket: Socket) : Runnable {
     override fun run() {
         try {
             //读取信息流
-            var flag = true
+            val flag = true
             val brIn = BufferedReader(InputStreamReader(socket.getInputStream()))//通过缓存方式读取信息流中的内容
 
             while (flag) {
@@ -37,25 +41,18 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                         } else {
                             Log.log("线程 $clientName 尝试获取$CHAT_LOCKER")
                         }
-                        chatLogSem.acquire()
+                        chatMutex.acquire()
                         try {
                             Log.log("线程 $clientName 得到$CHAT_LOCKER")
-                            ChatLogPanel.textMessage.append(line + "\r\n")//将信息添加到服务端聊天记录中
-                            ChatLogPanel.chatLogger.add(line)
-                            ChatLogPanel.textMessage.caretPosition = ChatLogPanel.textMessage.text.length//设置消息显示最新一行，也就是滚动条出现在末尾，显示最新一条输入的信息
+                            chatQueue.offer(line)
+                            notEmpty.release()
+                            chatHistories.add(line)
                             Log.log("线程 $clientName 发送信息")
-
-//                        socketListSem.acquire()
-//                        try {
-//                        SendServer(userSocketList, line, "1")//将信息转发给客户端
                             SendServer(line, "1")//将信息转发给客户端
-//                        } finally {
-//                            socketListSem.release()
-//                        }
                         } catch (e: Exception) {
                             e.printStackTrace()
                         } finally {
-                            chatLogSem.release()
+                            chatMutex.release()
                             Log.log("线程 $clientName 释放$CHAT_LOCKER")
                         }
                     }
@@ -64,38 +61,20 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                         clientName = line
                         Log.log("与 $clientName 建立连接")
 
-                        Log.log("线程 $clientName 尝试获取name锁")
-                        nameListSem.acquire()
-                        socketListSem.acquire()
-                        try {
-                            Log.log("线程 $clientName 得到name锁")
-                            StartServer.userNames.add(line)//将新客户端用户名添加到容器中
-                            ChatLogPanel.userList.setListData(StartServer.userNames)//更新服务端用户列表
-                            SendServer(StartServer.userNames, "2")//将用户列表以字符串的形式发给客户端
-                        } finally {
-                            socketListSem.release()
-                            nameListSem.release()
-                            Log.log("线程 $clientName 释放name锁")
-                        }
+                        StartServer.userNames.add(line)//将新客户端用户名添加到容器中
+                        ChatLogPanel.userJL.setListData(StartServer.userNames)//更新服务端用户列表
+                        SendServer(StartServer.userNames, "2")//将用户列表以字符串的形式发给客户端
                     }
                     '3' -> {//3代表有用户端退出连接
                         Log.log("线程 $line 退出聊天")
 
-                        nameListSem.acquire()
-                        socketListSem.acquire()
-                        try {
-                            StartServer.userNames.remove(line)//移除容器中已退出的客户端用户名
-                            StartServer.userSocketList.remove(socket)//移除容器中已退出的客户端的socket
-                            ChatLogPanel.userList.setListData(StartServer.userNames)//更新服务端用户列表
-                            SendServer(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
-                        } finally {
-                            nameListSem.release()
-                            socketListSem.release()
-                        }
+                        StartServer.userNames.remove(line)//移除容器中已退出的客户端用户名
+                        StartServer.userSockets.remove(socket)//移除容器中已退出的客户端的socket
+                        ChatLogPanel.userJL.setListData(StartServer.userNames)//更新服务端用户列表
+                        SendServer(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
 
                         socket.close()//关闭该客户端的socket
-                        throw InterruptedException()
-//                    flag = false
+                        throw InterruptedException()//抛出中断结束本线程
                     }
                 }
             }
@@ -107,12 +86,4 @@ class ReceiveServer(private val socket: Socket) : Runnable {
         }
     }
 
-    companion object {
-        //        val lock: ReentrantLock = ReentrantLock(true)
-        val chatLogSem = Semaphore(1, true)
-        val socketListSem = Semaphore(1, true)
-        val nameListSem = Semaphore(1, true)
-
-//        val userNames: Vector<String>
-    }
 }

@@ -15,7 +15,7 @@ import javax.swing.WindowConstants
  * Date: 2018-09-29
  * Time: 11:01
  */
-class MainFrame(private val myTitle: String = "OS-聊天室") : JFrame(myTitle) {
+class MainFrame(myTitle: String = "聊天室") : JFrame(myTitle) {
 
     init {
         defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
@@ -30,7 +30,7 @@ class MainFrame(private val myTitle: String = "OS-聊天室") : JFrame(myTitle) {
             //关闭窗体
             override fun windowClosing(e: WindowEvent?) {
                 //如果有客户端存在，发信息给客户端，并退出
-                if (StartServer.userSocketList != null && StartServer.userSocketList!!.size != 0) {
+                if (StartServer.userSockets.size != 0) {
                     try {
                         SendServer("", "4")//4代表服务端退出
                     } catch (e1: IOException) {
