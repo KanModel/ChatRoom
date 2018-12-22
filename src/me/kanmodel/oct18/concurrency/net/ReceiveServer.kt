@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities
  */
 class ReceiveServer(private val socket: Socket) : Runnable {
     var clientName: String = ""//记录客户端名字
+    var proofTemp: String = ""
 
     override fun run() {
         try {
@@ -88,29 +89,8 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                             Log.log("线程 $clientName 释放$LIST_MUTEX")
                         }
                     }
-                    '3' -> {//3代表有用户端退出连接
-
-                        socketsMutex.acquire()
-                        try {
-                            userSockets.remove(socket)//移除容器中已退出的客户端的socket
-                            socket.close()//关闭该客户端的socket
-                        }finally {
-                            socketsMutex.release()
-                        }
-                        Log.log("线程 $clientName 尝试获取$LIST_MUTEX")
-                        listMutex.acquire()
-                        try {
-                            Log.log("线程 $clientName 得到$LIST_MUTEX")
-                            SwingUtilities.invokeLater {
-                                StartServer.userNames.remove(line)//移除容器中已退出的客户端用户名
-                                ChatLogPanel.userJL.setListData(StartServer.userNames)//更新服务端用户列表
-                                SendServer(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
-                            }
-                        }finally {
-                            listMutex.release()
-                            Log.log("线程 $clientName 释放$LIST_MUTEX")
-                        }
-                        Log.log("线程 $line 退出聊天, 当前客户端个数为：${userSockets.size}")
+                    '3' -> {//3代表用户端退出连接
+                        proofTemp = line
                         throw InterruptedException()//抛出中断结束本线程
                     }
                 }
@@ -118,6 +98,30 @@ class ReceiveServer(private val socket: Socket) : Runnable {
             Log.log("线程 $clientName 作业完毕")
         } catch (e: InterruptedException) {
             Log.log("线程 $clientName 中断退出")
+
+            if (clientName != proofTemp) Log.log("退出用户名不一致")
+
+            socketsMutex.acquire()
+            try {
+                userSockets.remove(socket)//移除容器中已退出的客户端的socket
+                socket.close()//关闭该客户端的socket
+            }finally {
+                socketsMutex.release()
+            }
+            Log.log("线程 $clientName 尝试获取$LIST_MUTEX")
+            listMutex.acquire()
+            try {
+                Log.log("线程 $clientName 得到$LIST_MUTEX")
+                SwingUtilities.invokeLater {
+                    StartServer.userNames.remove(clientName)//移除容器中已退出的客户端用户名
+                    ChatLogPanel.userJL.setListData(StartServer.userNames)//更新服务端用户列表
+                    SendServer(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
+                }
+            }finally {
+                listMutex.release()
+                Log.log("线程 $clientName 释放$LIST_MUTEX")
+            }
+            Log.log("线程 $clientName 退出聊天, 当前客户端个数为：${userSockets.size}")
         } catch (e: IOException) {
             e.printStackTrace()
         }
