@@ -1,5 +1,7 @@
 package me.kanmodel.oct18.concurrency.net
 
+import me.kanmodel.oct18.concurrency.net.DataManager.socketsMutex
+import me.kanmodel.oct18.concurrency.net.DataManager.userSockets
 import java.io.IOException
 import java.io.PrintWriter
 import java.net.Socket
@@ -16,9 +18,14 @@ constructor() {
         val messages = info + message//添加信息头标记
         var pwOut: PrintWriter?
 
-        for (s in StartServer.userSockets) {//将信息发送给每个客户端
-            pwOut = PrintWriter(s.getOutputStream(), true)
-            pwOut.println(messages)
+        socketsMutex.acquire()
+        try {
+            for (s in userSockets) {//将信息发送给每个客户端
+                pwOut = PrintWriter(s.getOutputStream(), true)
+                pwOut.println(messages)
+            }
+        }finally {
+            socketsMutex.release()
         }
     }
 

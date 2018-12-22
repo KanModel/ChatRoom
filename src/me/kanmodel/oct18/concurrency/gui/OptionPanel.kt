@@ -2,6 +2,7 @@ package me.kanmodel.oct18.concurrency.gui
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main
+import me.kanmodel.oct18.concurrency.net.DataManager.userSockets
 import me.kanmodel.oct18.concurrency.net.SendServer
 import me.kanmodel.oct18.concurrency.net.StartServer
 import java.awt.Dimension
@@ -68,7 +69,7 @@ class OptionPanel : JPanel() {
                 ipText.isEditable = true
                 portText.isEditable = true
                 serverName.isEditable = true
-                if (StartServer.userSockets.size != 0) {
+                if (userSockets.size != 0) {
                     try {
                         SendServer("", 4.toString() + "")
                     } catch (e1: IOException) {
@@ -78,7 +79,7 @@ class OptionPanel : JPanel() {
                 try {
                     StartServer.serverSocket!!.close()//关闭服务端
                     StartServer.serverSocket = null
-                    StartServer.userSockets.clear()
+                    userSockets.clear()
                     StartServer.userNames.clear()
                     StartServer.flag = false//改变服务端循环标记
                     Log.log("服务器关闭")

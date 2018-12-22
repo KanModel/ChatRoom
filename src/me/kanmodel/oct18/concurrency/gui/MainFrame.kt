@@ -1,5 +1,6 @@
 package me.kanmodel.oct18.concurrency.gui
 
+import me.kanmodel.oct18.concurrency.net.DataManager.userSockets
 import me.kanmodel.oct18.concurrency.net.SendServer
 import me.kanmodel.oct18.concurrency.net.StartServer
 import java.awt.Dimension
@@ -30,7 +31,7 @@ class MainFrame(myTitle: String = "聊天室") : JFrame(myTitle) {
             //关闭窗体
             override fun windowClosing(e: WindowEvent?) {
                 //如果有客户端存在，发信息给客户端，并退出
-                if (StartServer.userSockets.size != 0) {
+                if (userSockets.size != 0) {
                     try {
                         SendServer("", "4")//4代表服务端退出
                     } catch (e1: IOException) {

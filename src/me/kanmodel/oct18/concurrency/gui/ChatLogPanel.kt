@@ -2,11 +2,12 @@ package me.kanmodel.oct18.concurrency.gui
 
 import me.kanmodel.oct18.concurrency.util.Log
 import me.kanmodel.oct18.concurrency.Main
-import me.kanmodel.oct18.concurrency.net.DataManager.CHAT_LOCKER
+import me.kanmodel.oct18.concurrency.net.DataManager.CHAT_MUTEX
 import me.kanmodel.oct18.concurrency.net.DataManager.chatHistories
 import me.kanmodel.oct18.concurrency.net.DataManager.chatMutex
 import me.kanmodel.oct18.concurrency.net.DataManager.chatQueue
 import me.kanmodel.oct18.concurrency.net.DataManager.notEmpty
+import me.kanmodel.oct18.concurrency.net.DataManager.userSockets
 import me.kanmodel.oct18.concurrency.net.SendServer
 import me.kanmodel.oct18.concurrency.net.StartServer
 import java.awt.BorderLayout
@@ -74,14 +75,14 @@ class ChatLogPanel : JPanel() {
         //判断内容是否为空
         if (messages == "") {
             JOptionPane.showMessageDialog(Main.mainFrame, "内容不能为空！")
-        } else if (StartServer.userSockets.size == 0) {//判断是否已经连接成功
+        } else if (userSockets.size == 0) {//判断是否已经连接成功
             JOptionPane.showMessageDialog(Main.mainFrame, "未连接成功，不能发送消息！")
         } else {
             try {
                 val line = "${SimpleDateFormat("HH:mm:ss").format(Date())} [${getServerName()}]:$messages"
                 SendServer(line, 1.toString() + "")//将信息发送给所有客户端
 
-                Log.log("服务端线程 尝试获取$CHAT_LOCKER")
+                Log.log("服务端线程 尝试获取$CHAT_MUTEX")
                 chatMutex.acquire()
                 try {
 //                    chatLogJTA.append("$line\r\n")//将信息添加到客户端聊天记录中
@@ -92,7 +93,7 @@ class ChatLogPanel : JPanel() {
                     e.printStackTrace()
                 }finally {
                     chatMutex.release()
-                    Log.log("服务端线程 释放$CHAT_LOCKER")
+                    Log.log("服务端线程 释放$CHAT_MUTEX")
                 }
                 message.text = null//消息框设置为空
             } catch (e1: IOException) {

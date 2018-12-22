@@ -77,9 +77,9 @@ class WindowClient {
 //        label2.setBounds(40, 40, 80, 30)
 //        window.add(label2)
 
-        user = JList()
-        user.border = TitledBorder("用户列表")
-        val scrollPane = JScrollPane(user)//设置滚动条
+        userJL = JList()
+        userJL.border = TitledBorder("用户列表")
+        val scrollPane = JScrollPane(userJL)//设置滚动条
         scrollPane.setBounds(10, 50, 120, 240)
         window.add(scrollPane)
 
@@ -115,7 +115,7 @@ class WindowClient {
                 //如果仍在连接，发信息给服务端，并退出
                 if (socket != null && socket!!.isConnected) {
                     try {
-                        SendClient(socket!!, getName(), "3")
+                        ClientSender(socket!!, getName(), "3")
                     } catch (e1: IOException) {
                         e1.printStackTrace()
                     }
@@ -127,49 +127,56 @@ class WindowClient {
 
         //关闭连接
         exit.addActionListener {
-            //如果仍在连接，将信息发给服务端
-            if (socket == null) {
-                JOptionPane.showMessageDialog(window, "已关闭连接")
-            } else if (socket != null && socket!!.isConnected) {
-                try {
-                    SendClient(socket!!, getName(), "3")//发送信息给服务端
-                    link.text = "连接"
-                    exit.text = "已退出"
-                    socket!!.close()//关闭socket
-                    socket = null
-                } catch (e1: IOException) {
-                    e1.printStackTrace()
-                }
+            Thread{
+                //如果仍在连接，将信息发给服务端
+                if (socket == null) {
+                    JOptionPane.showMessageDialog(window, "已关闭连接")
+                } else if (socket != null && socket!!.isConnected) {
+                    try {
+                        userJL.setListData(Vector<String>())
+                        ClientSender(socket!!, getName(), "3")//发送信息给服务端
+                        link.text = "连接"
+                        exit.text = "已退出"
+                        socket!!.close()//关闭socket
+                        socket = null
+                    } catch (e1: IOException) {
+                        e1.printStackTrace()
+                    }
 
-            }
+                }
+            }.start()
         }
 
         //建立连接
         link.addActionListener {
-            //判断是否已经连接成功
-            if (socket != null && socket!!.isConnected) {
-                JOptionPane.showMessageDialog(window, "已经连接成功！")
-            } else {
-                val ipString = ip.text//获取ip地址
-                val portClient = port.text//获取端口号
-
-                if ("" == ipString || "" == portClient) {//判断获取内容是否为空
-                    JOptionPane.showMessageDialog(window, "ip或端口号为空！")
+            Thread {
+                //判断是否已经连接成功
+                if (socket != null && socket!!.isConnected) {
+                    JOptionPane.showMessageDialog(window, "已经连接成功！")
                 } else {
-                    try {
-                        val ports = Integer.parseInt(portClient)//将端口号转为整形
-                        socket = Socket(ipString, ports)//建立连接
-                        link.text = "已连接"//更改button显示信息
-                        exit.text = "退出"
-                        SendClient(socket!!, getName(), "2")//发送该客户端名称至服务器
-//                        Thread(ReceiveClient(socket!!)).start()//启动接收线程
-                        StartClient(socket!!)//启动接收线程
-                        textMessage.text = ""
-                    } catch (e2: Exception) {
-                        JOptionPane.showMessageDialog(window, "连接未成功！可能是ip或端口号格式不对，或服务器未开启。")
+                    val ipString = ip.text//获取ip地址
+                    val portClient = port.text//获取端口号
+
+                    if ("" == ipString || "" == portClient) {//判断获取内容是否为空
+                        JOptionPane.showMessageDialog(window, "ip或端口号为空！")
+                    } else {
+                        try {
+
+                            val ports = Integer.parseInt(portClient)//将端口号转为整形
+                            socket = Socket(ipString, ports)//建立连接
+                            socket!!.tcpNoDelay = true
+                            link.text = "已连接"//更改button显示信息
+                            exit.text = "退出"
+                            ClientSender(socket!!, getName(), "2")//发送该客户端名称至服务器
+                            Thread(ClientReceiver(socket!!)).start()//启动接收线程
+                            textMessage.text = ""
+
+                        } catch (e2: Exception) {
+                            JOptionPane.showMessageDialog(window, "连接未成功！可能是ip或端口号格式不对，或服务器未开启。")
+                        }
                     }
                 }
-            }
+            }.start()
         }
 
         //点击按钮发送信息
@@ -195,7 +202,7 @@ class WindowClient {
         } else {
             try {
                 //发送信息
-                SendClient(socket!!, "${SimpleDateFormat("HH:mm:ss").format(Date())} [${getName()}]:$messages", "1")
+                ClientSender(socket!!, messages, "1")
                 message.text = null//文本框内容设置为空
             } catch (e1: IOException) {
                 JOptionPane.showMessageDialog(window, "信息发送失败！")
@@ -215,7 +222,7 @@ class WindowClient {
         lateinit var exit: JButton
         lateinit var textMessage: JTextArea
         var socket: Socket? = null
-        lateinit var user: JList<String>
+        lateinit var userJL: JList<String>
 
         //主函数入口
         @JvmStatic
