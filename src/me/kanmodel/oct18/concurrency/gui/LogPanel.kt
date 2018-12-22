@@ -40,8 +40,10 @@ class LogPanel : JPanel() {
     fun log(str: String) {
         val time = SimpleDateFormat("HH:mm:ss").format(Date())
         val txt = "\n$time - ${++count}: $str"
-        text.append(txt)
-        text.selectAll()
+        SwingUtilities.invokeLater{
+            text.append(txt)
+            text.selectAll()
+        }
         print(txt)
     }
 }

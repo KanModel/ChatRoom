@@ -15,10 +15,10 @@ object DataManager {
     const val NOT_EMPTY_LOCKER = "notEmpty"
     const val SOCKETS_MUTEX = "socketsMutex"
     const val LIST_MUTEX = "listMutex"
-    val chatMutex = Semaphore(1)
+    val chatMutex = Semaphore(1, true)
     val notEmpty = Semaphore(0)
-    val socketsMutex = Semaphore(1)
-    val listMutex = Semaphore(1)
+    val socketsMutex = Semaphore(1, true)
+    val listMutex = Semaphore(1, true)
 
     val chatHistories = Vector<String>()//ÁÄÌì¼ÇÂ¼
     /**

@@ -112,11 +112,11 @@ class ReceiveServer(private val socket: Socket) : Runnable {
             listMutex.acquire()
             try {
                 Log.log("线程 $clientName 得到$LIST_MUTEX")
+                StartServer.userNames.remove(clientName)//移除容器中已退出的客户端用户名
                 SwingUtilities.invokeLater {
-                    StartServer.userNames.remove(clientName)//移除容器中已退出的客户端用户名
                     ChatLogPanel.userJL.setListData(StartServer.userNames)//更新服务端用户列表
-                    SendServer(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
                 }
+                SendServer(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
             }finally {
                 listMutex.release()
                 Log.log("线程 $clientName 释放$LIST_MUTEX")

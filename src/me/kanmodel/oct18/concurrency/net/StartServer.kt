@@ -53,7 +53,7 @@ constructor(private val port: Int) : Runnable {
                 if (chatHistories.isNotEmpty()) {
                     for (i in max(chatHistories.size - 11, 0) until chatHistories.size) {
                         SendServer(s, chatHistories[i], "1")//发送聊天记录
-                        Thread.sleep(10)
+//                        Thread.sleep(10)
                     }
                     SendServer(s, "---以上为未读记录---", "1")//发送聊天记录
                 }
