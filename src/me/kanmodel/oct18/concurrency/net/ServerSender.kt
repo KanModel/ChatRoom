@@ -11,7 +11,7 @@ import java.net.Socket
  * @param message 信息
  * @param info 标记
  */
-class SendServer @Throws(IOException::class)
+class ServerSender @Throws(IOException::class)
 constructor() {
 
     constructor(message: Any, info: String) : this() {

@@ -9,8 +9,8 @@ import me.kanmodel.oct18.concurrency.net.DataManager.userSockets
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
-import java.util.ArrayList
 import java.util.Vector
+import java.util.concurrent.Executors
 
 import javax.swing.JOptionPane
 import kotlin.math.max
@@ -32,6 +32,7 @@ constructor(private val port: Int) : Runnable {
 
         Thread(ChatLogRefresh()).start()
         Log.log("刷新线程 创建完成！")
+        val exec = Executors.newCachedThreadPool()//接受信息线程池创建
         while (flag) {//开启循环，等待接收客户端
             try {
                 s = serverSocket!!.accept()//接收客户端
@@ -49,17 +50,19 @@ constructor(private val port: Int) : Runnable {
 
                 //启动与客户端相对应的信息接收线程
                 Log.log("为该连接启动信息接受线程")
-                Thread(ReceiveServer(s)).start()
+                exec.execute(ServerReceiver(s))
+//                Thread(ServerReceiver(s)).start()
                 if (chatHistories.isNotEmpty()) {
                     for (i in max(chatHistories.size - 11, 0) until chatHistories.size) {
-                        SendServer(s, chatHistories[i], "1")//发送聊天记录
+                        ServerSender(s, chatHistories[i], "1")//发送聊天记录
 //                        Thread.sleep(10)
                     }
-                    SendServer(s, "---以上为未读记录---", "1")//发送聊天记录
+                    ServerSender(s, "---以上为未读记录---", "1")//发送聊天记录
                 }
 
             } catch (e: IOException) {
                 JOptionPane.showMessageDialog(Main.mainFrame, "服务器关闭！")
+                exec.shutdown()
             }
         }
     }

@@ -38,9 +38,11 @@ class ClientReceiver(private val s: Socket) : Runnable {
 
                 if (info == '2' || info == '3') {//有新用户加入或退出，2为加入，3为退出
                     val sub = line.substring(1, line.length - 1)//去掉字符串头尾中括号
-                    val data = sub.split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()//分割姓名列表
-                    WindowClient.userJL.clearSelection()
-                    WindowClient.userJL.setListData(data)
+                    SwingUtilities.invokeLater{
+                        val data = sub.split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()//分割姓名列表
+                        WindowClient.userJL.clearSelection()
+                        WindowClient.userJL.setListData(data)
+                    }
                 }
 
                 if (info == '4') {//4代表服务端退出

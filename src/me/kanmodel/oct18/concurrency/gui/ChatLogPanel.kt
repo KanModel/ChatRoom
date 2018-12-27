@@ -8,8 +8,7 @@ import me.kanmodel.oct18.concurrency.net.DataManager.chatMutex
 import me.kanmodel.oct18.concurrency.net.DataManager.chatQueue
 import me.kanmodel.oct18.concurrency.net.DataManager.notEmpty
 import me.kanmodel.oct18.concurrency.net.DataManager.userSockets
-import me.kanmodel.oct18.concurrency.net.SendServer
-import me.kanmodel.oct18.concurrency.net.StartServer
+import me.kanmodel.oct18.concurrency.net.ServerSender
 import java.awt.BorderLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -80,7 +79,7 @@ class ChatLogPanel : JPanel() {
         } else {
             try {
                 val line = "${SimpleDateFormat("HH:mm:ss").format(Date())} [${getServerName()}]:$messages"
-                SendServer(line, 1.toString() + "")//将信息发送给所有客户端
+                ServerSender(line, 1.toString() + "")//将信息发送给所有客户端
 
                 Log.log("服务端线程 尝试获取$CHAT_MUTEX")
                 chatMutex.acquire()

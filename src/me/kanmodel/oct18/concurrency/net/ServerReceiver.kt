@@ -24,7 +24,7 @@ import javax.swing.SwingUtilities
 /**
  * 服务端信息接收线程，为每一个客户端的Socket建立一个线程
  */
-class ReceiveServer(private val socket: Socket) : Runnable {
+class ServerReceiver(private val socket: Socket) : Runnable {
     var clientName: String = ""//记录客户端名字
     var proofTemp: String = ""
 
@@ -62,7 +62,7 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                             notEmpty.release()
                             chatHistories.add(line)
 //                            Log.log("线程 $clientName 发送信息")
-                            SendServer(line, "1")//将信息转发给客户端
+                            ServerSender(line, "1")//将信息转发给客户端
                         } catch (e: Exception) {
                             e.printStackTrace()
                         } finally {
@@ -82,7 +82,7 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                             SwingUtilities.invokeLater{
                                 StartServer.userNames.add(line)//将新客户端用户名添加到容器中
                                 ChatLogPanel.userJL.setListData(StartServer.userNames)//更新服务端用户列表
-                                SendServer(StartServer.userNames, "2")//将用户列表以字符串的形式发给客户端
+                                ServerSender(StartServer.userNames, "2")//将用户列表以字符串的形式发给客户端
                             }
                         }finally {
                             listMutex.release()
@@ -116,8 +116,8 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                 SwingUtilities.invokeLater {
                     StartServer.userNames.remove(clientName)//移除容器中已退出的客户端用户名
                     ChatLogPanel.userJL.setListData(StartServer.userNames)//更新服务端用户列表
+                    ServerSender(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
                 }
-                SendServer(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
             }finally {
                 listMutex.release()
                 Log.log("线程 $clientName 释放$LIST_MUTEX")

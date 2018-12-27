@@ -1,8 +1,7 @@
 package me.kanmodel.oct18.concurrency.gui
 
 import me.kanmodel.oct18.concurrency.net.DataManager.userSockets
-import me.kanmodel.oct18.concurrency.net.SendServer
-import me.kanmodel.oct18.concurrency.net.StartServer
+import me.kanmodel.oct18.concurrency.net.ServerSender
 import java.awt.Dimension
 import java.awt.event.*
 import java.io.IOException
@@ -33,7 +32,7 @@ class MainFrame(myTitle: String = "聊天室") : JFrame(myTitle) {
                 //如果有客户端存在，发信息给客户端，并退出
                 if (userSockets.size != 0) {
                     try {
-                        SendServer("", "4")//4代表服务端退出
+                        ServerSender("", "4")//4代表服务端退出
                     } catch (e1: IOException) {
                         e1.printStackTrace()
                     }
