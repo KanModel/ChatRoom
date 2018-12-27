@@ -36,19 +36,19 @@ constructor(private val port: Int) : Runnable {
             try {
                 s = serverSocket!!.accept()//接收客户端
                 s.tcpNoDelay = true
+                val id = s!!.inetAddress.hostName
                 socketsMutex.acquire()
                 try {
                     userSockets.add(s)//将客户端的socket添加到容器中
                 }finally {
                     socketsMutex.release()
+                    Log.log("来自 $id 连接，当前连接数：${userSockets.size}")
                 }
 
                 //打印客户端信息
-                val id = s!!.inetAddress.hostName
-                Log.log("$id 连接，当前客户端个数为：" + userSockets.size)
 
                 //启动与客户端相对应的信息接收线程
-                Log.log("为该客户端启动信息接受线程")
+                Log.log("为该连接启动信息接受线程")
                 Thread(ReceiveServer(s)).start()
                 if (chatHistories.isNotEmpty()) {
                     for (i in max(chatHistories.size - 11, 0) until chatHistories.size) {
@@ -59,7 +59,7 @@ constructor(private val port: Int) : Runnable {
                 }
 
             } catch (e: IOException) {
-                JOptionPane.showMessageDialog(Main.mainFrame, "服务端退出！")
+                JOptionPane.showMessageDialog(Main.mainFrame, "服务器关闭！")
             }
         }
     }

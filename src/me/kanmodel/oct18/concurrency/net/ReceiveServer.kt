@@ -107,21 +107,22 @@ class ReceiveServer(private val socket: Socket) : Runnable {
                 socket.close()//关闭该客户端的socket
             }finally {
                 socketsMutex.release()
+                Log.log("连接 $clientName 断开, 当前连接数：${userSockets.size}")
             }
             Log.log("线程 $clientName 尝试获取$LIST_MUTEX")
             listMutex.acquire()
             try {
                 Log.log("线程 $clientName 得到$LIST_MUTEX")
-                StartServer.userNames.remove(clientName)//移除容器中已退出的客户端用户名
                 SwingUtilities.invokeLater {
+                    StartServer.userNames.remove(clientName)//移除容器中已退出的客户端用户名
                     ChatLogPanel.userJL.setListData(StartServer.userNames)//更新服务端用户列表
                 }
                 SendServer(StartServer.userNames, "3")//将用户列表以字符串的形式发给客户端
             }finally {
                 listMutex.release()
                 Log.log("线程 $clientName 释放$LIST_MUTEX")
+                Log.log("线程 $clientName 结束")
             }
-            Log.log("线程 $clientName 退出聊天, 当前客户端个数为：${userSockets.size}")
         } catch (e: IOException) {
             e.printStackTrace()
         }
