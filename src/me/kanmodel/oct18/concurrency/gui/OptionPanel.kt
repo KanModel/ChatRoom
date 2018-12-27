@@ -13,6 +13,7 @@ class OptionPanel : JPanel() {
     private val btn = JButton("Test")
     private val resizeToggleBtn = JToggleButton("调整大小: 关")
     private val serverToggleBtn = JToggleButton("服务器: 关")
+    private lateinit var startThread: Thread
 
     private val port: Int
         get() {
@@ -56,7 +57,8 @@ class OptionPanel : JPanel() {
                 if (serverPort != 0) {
                     try {
                         StartServer.flag = true
-                        Thread(StartServer(serverPort)).start()
+                        startThread = Thread(StartServer(serverPort))
+                        Thread(startThread).start()
                         Log.log("服务器启动于${ipText.text}:$port")
                     } catch (e: IOException) {
                         JOptionPane.showMessageDialog(Main.mainFrame, "服务器启动失败")
@@ -82,7 +84,8 @@ class OptionPanel : JPanel() {
                     userSockets.clear()
                     StartServer.userNames.clear()
                     StartServer.flag = false//改变服务端循环标记
-                    Log.log("服务器关闭")
+                    startThread.interrupt()
+//                    Log.log("服务器关闭")
                 } catch (e1: IOException) {
                     e1.printStackTrace()
                     Log.log("服务器关闭异常")

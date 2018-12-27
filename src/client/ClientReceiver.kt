@@ -17,7 +17,6 @@ import sun.text.normalizer.UTF16.append
 import javax.swing.SwingUtilities
 
 
-
 //客户端接收线程
 class ClientReceiver(private val s: Socket) : Runnable {
     override fun run() {
@@ -38,7 +37,7 @@ class ClientReceiver(private val s: Socket) : Runnable {
 
                 if (info == '2' || info == '3') {//有新用户加入或退出，2为加入，3为退出
                     val sub = line.substring(1, line.length - 1)//去掉字符串头尾中括号
-                    SwingUtilities.invokeLater{
+                    SwingUtilities.invokeLater {
                         val data = sub.split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()//分割姓名列表
                         WindowClient.userJL.clearSelection()
                         WindowClient.userJL.setListData(data)
@@ -50,11 +49,15 @@ class ClientReceiver(private val s: Socket) : Runnable {
                     WindowClient.exit.text = "已退出"
                     WindowClient.socket!!.close()
                     WindowClient.socket = null
-                    break
+                    val data = Array<String>(0) { "" }
+                    WindowClient.userJL.setListData(data)
+                    throw InterruptedException()
                 }
             }
         } catch (e: IOException) {
             JOptionPane.showMessageDialog(WindowClient.window, "客户端已退出连接")
+        } catch (ei: InterruptedException) {
+            JOptionPane.showMessageDialog(WindowClient.window, "服务器关闭")
         }
     }
 }
