@@ -84,9 +84,10 @@ class ServerReceiver(private val socket: Socket) : Runnable {
                             Log.log("线程 $clientName 得到$CHAT_MUTEX")
                             val pre = "${SimpleDateFormat("HH:mm:ss").format(Date())} [$clientName]:"
                             chatQueue.offer(pre)
-                            chatQueue.offer(line)
                             notEmpty.release()
                             chatHistories.add(pre)
+                            chatQueue.offer(line)
+                            notEmpty.release()
                             chatHistories.add(line)
                             ServerSender(pre, "1")//将信息转发给客户端
                             ServerSender(line, "5")//将信息转发给客户端
