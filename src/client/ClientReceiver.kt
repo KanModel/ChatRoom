@@ -7,6 +7,7 @@ package client
  * Date: 2018-10-05
  * Time: 20:08
  */
+import me.kanmodel.oct18.concurrency.util.Base64Util.base642pic
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -30,6 +31,18 @@ class ClientReceiver(private val s: Socket) : Runnable {
                     if (line != "") {
                         SwingUtilities.invokeLater {
                             WindowClient.textMessage.append(line + "\r\n")    //将消息添加到文本域中
+                            WindowClient.textMessage.caretPosition = WindowClient.textMessage.text.length//设置消息显示最新一行，也就是滚动条出现在末尾，显示最新一条输入的信息
+                        }
+                    }
+                }
+
+                if (info == '5') {//收到图片
+                    if (line != "") {
+                        WindowClient.tmpCount = WindowClient.tmpCount?.plus(1)
+                        println("${WindowClient.tmpDir}\\t${WindowClient.tmpCount}.png")
+                        base642pic(line, "${WindowClient.tmpDir}\\t${WindowClient.tmpCount}.png")
+                        SwingUtilities.invokeLater {
+                            WindowClient.textMessage.append("图片${WindowClient.tmpCount}\r\n")    //将消息添加到文本域中
                             WindowClient.textMessage.caretPosition = WindowClient.textMessage.text.length//设置消息显示最新一行，也就是滚动条出现在末尾，显示最新一条输入的信息
                         }
                     }

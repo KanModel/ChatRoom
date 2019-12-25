@@ -7,16 +7,19 @@ package client
  * Date: 2018-10-05
  * Time: 20:08
  */
+import me.kanmodel.oct18.concurrency.util.Base64Util.pic2Base64
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import java.io.File
 import java.io.IOException
 import java.net.Socket
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.*
 import javax.swing.border.TitledBorder
+import javax.swing.filechooser.FileNameExtensionFilter
 
 class WindowClient {
     internal lateinit var port: JTextField
@@ -24,9 +27,25 @@ class WindowClient {
     internal lateinit var ip: JTextField
     internal lateinit var message: JTextField
     internal lateinit var send: JButton
+    internal lateinit var pic: JButton
 
     //初始化窗体
     init {
+        //配置缓存路径
+        val path = System.getProperty("user.dir")
+        println("Path: $path")
+        tmpDir = File("$path\\tmp")
+        if (!tmpDir.exists() || !tmpDir.isDirectory) {
+            println("tmp文件夹不存在 创建")
+            tmpDir.mkdir()
+            tmpCount = 0
+        } else {
+            println("tmp文件夹存在 统计文件数量")
+            val tmpFiles = tmpDir.listFiles()
+            tmpCount = tmpFiles.size
+            println("tmp count: $tmpCount")
+        }
+
         init()
     }
 
@@ -95,13 +114,17 @@ class WindowClient {
         window.add(scrollPane1)
 
         message = JTextField()
-        message.setBounds(10, 300, 360, 50)
+        message.setBounds(10, 300, 320, 50)
         message.text = null
         window.add(message)
 
         send = JButton("发送")
-        send.setBounds(380, 305, 70, 40)
+        send.setBounds(340, 305, 60, 40)
         window.add(send)
+
+        pic = JButton("图片")
+        pic.setBounds(410, 305, 60, 40)
+        window.add(pic)
 
         myEvent()//添加监听事件
         window.isVisible = true//设置窗体可见
@@ -182,6 +205,29 @@ class WindowClient {
         //点击按钮发送信息
         send.addActionListener { sendMsg() }
 
+        pic.addActionListener {
+            val fileChooser = JFileChooser()
+            val filter = FileNameExtensionFilter("Picture File", "jpg", "png")
+            fileChooser.fileFilter = filter
+            fileChooser.showOpenDialog(window)
+            if (fileChooser.selectedFile != null) {
+                val file = fileChooser.selectedFile
+                val base64Str = pic2Base64(file)
+                println("${file.absolutePath}: ${file.parentFile.absolutePath} : ${file.name}")
+                println(base64Str)
+//                base642pic(base64Str, "${file.parentFile.absolutePath}\\64test.png")
+
+                try {
+                    //发送信息
+                    ClientSender(socket!!, base64Str, "5")
+                } catch (e1: IOException) {
+                    JOptionPane.showMessageDialog(window, "图片发送失败！")
+                }
+            } else {
+                println("File chooser exit!")
+            }
+        }
+
         //按回车发送信息
         message.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent?) {
@@ -223,6 +269,8 @@ class WindowClient {
         lateinit var textMessage: JTextArea
         var socket: Socket? = null
         lateinit var userJL: JList<String>
+        lateinit var tmpDir: File
+        var tmpCount: Int? = null
 
         //主函数入口
         @JvmStatic

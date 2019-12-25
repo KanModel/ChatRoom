@@ -50,8 +50,8 @@ class ServerReceiver(private val socket: Socket) : Runnable {
                     throw InterruptedException()//抛出中断结束本线程
                 }
 
-                when (info) {//1代表收到的是信息
-                    '1' -> {
+                when (info) {
+                    '1' -> {//1代表文本信息
                         if (clientName == "") {
                             Log.log("对新用户尝试获取$CHAT_MUTEX")
                         } else {
@@ -66,6 +66,30 @@ class ServerReceiver(private val socket: Socket) : Runnable {
                             chatHistories.add(line)
 //                            Log.log("线程 $clientName 发送信息")
                             ServerSender(line, "1")//将信息转发给客户端
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        } finally {
+                            chatMutex.release()
+                            Log.log("线程 $clientName 释放$CHAT_MUTEX")
+                        }
+                    }
+                    '5' -> {//5代表图片消息
+                        if (clientName == "") {
+                            Log.log("对新用户尝试获取$CHAT_MUTEX")
+                        } else {
+                            Log.log("线程 $clientName 尝试获取$CHAT_MUTEX")
+                        }
+                        chatMutex.acquire()
+                        try {
+                            Log.log("线程 $clientName 得到$CHAT_MUTEX")
+                            val pre = "${SimpleDateFormat("HH:mm:ss").format(Date())} [$clientName]:"
+                            chatQueue.offer(pre)
+                            chatQueue.offer(line)
+                            notEmpty.release()
+                            chatHistories.add(pre)
+                            chatHistories.add(line)
+                            ServerSender(pre, "1")//将信息转发给客户端
+                            ServerSender(line, "5")//将信息转发给客户端
                         } catch (e: Exception) {
                             e.printStackTrace()
                         } finally {
