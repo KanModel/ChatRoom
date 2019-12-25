@@ -19,6 +19,10 @@ object DataManager {
     val notEmpty = Semaphore(0)
     val socketsMutex = Semaphore(1, true)
     val listMutex = Semaphore(1, true)
+//    val chatMutex = Semaphore(1)
+//    val notEmpty = Semaphore(0)
+//    val socketsMutex = Semaphore(1)
+//    val listMutex = Semaphore(1)
 
     val chatHistories = Vector<String>()//ÁÄÌì¼ÇÂ¼
     /**

@@ -21,9 +21,9 @@ import kotlin.math.max
  */
 class StartServer @Throws(IOException::class)
 constructor(private val port: Int) : Runnable {
-    private val exec = Executors.newCachedThreadPool()//接受信息线程池创建
 
     override fun run() {
+        val exec = Executors.newCachedThreadPool()//接受信息线程池创建
         var s: Socket?
 
         try {
