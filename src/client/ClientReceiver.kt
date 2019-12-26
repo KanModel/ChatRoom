@@ -15,7 +15,12 @@ import java.net.Socket
 
 import javax.swing.JOptionPane
 import sun.text.normalizer.UTF16.append
+import java.awt.Image
+import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
+import javax.swing.text.StyledDocument
+
+
 
 
 //客户端接收线程
@@ -30,8 +35,8 @@ class ClientReceiver(private val s: Socket) : Runnable {
                 if (info == '1') {//代表发送的是消息
                     if (line != "") {
                         SwingUtilities.invokeLater {
-                            WindowClient.textMessage.append(line + "\r\n")    //将消息添加到文本域中
-                            WindowClient.textMessage.caretPosition = WindowClient.textMessage.text.length//设置消息显示最新一行，也就是滚动条出现在末尾，显示最新一条输入的信息
+                            val doc = WindowClient.textMessage.getStyledDocument()
+                            doc.insertString(doc.getLength(), line+"\r\n", null );
                         }
                     }
                 }
@@ -42,8 +47,15 @@ class ClientReceiver(private val s: Socket) : Runnable {
                         println("${WindowClient.tmpDir}\\t${WindowClient.tmpCount}.png")
                         base642pic(line, "${WindowClient.tmpDir}\\t${WindowClient.tmpCount}.png")
                         SwingUtilities.invokeLater {
-                            WindowClient.textMessage.append("图片${WindowClient.tmpCount}\r\n")    //将消息添加到文本域中
-                            WindowClient.textMessage.caretPosition = WindowClient.textMessage.text.length//设置消息显示最新一行，也就是滚动条出现在末尾，显示最新一条输入的信息
+                            val doc = WindowClient.textMessage.getStyledDocument()
+                            WindowClient.textMessage.setCaretPosition(doc.getLength()) // 设置插入位置
+
+                            val image = ImageIcon("${WindowClient.tmpDir}\\t${WindowClient.tmpCount}.png")
+                            image.setImage(image.getImage().getScaledInstance(200, 150, Image.SCALE_DEFAULT ));
+                            WindowClient.textMessage.insertIcon(image) // 插入图片
+                            doc.insertString(doc.getLength(), "\r\n", null );
+
+//                            WindowClient.textMessage.append("图片${WindowClient.tmpCount}\r\n")    //将消息添加到文本域中
                         }
                     }
                 }

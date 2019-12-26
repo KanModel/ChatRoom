@@ -102,13 +102,13 @@ class WindowClient {
         scrollPane.setBounds(10, 50, 120, 240)
         window.add(scrollPane)
 
-        textMessage = JTextArea()
+        textMessage = JTextPane()
         textMessage.setBounds(135, 50, 340, 240)
         textMessage.isEditable = false//文本不可编辑
         textMessage.border = TitledBorder("聊天记录")//设置标题
         //文本内容换行的两个需要配合着用
-        textMessage.lineWrap = true//设置文本内容自动换行，在超出文本区域时，可能会切断单词
-        textMessage.wrapStyleWord = true//设置以自动换行，以单词为整体，保证单词不会被切断
+//        textMessage.lineWrap = true//设置文本内容自动换行，在超出文本区域时，可能会切断单词
+//        textMessage.wrapStyleWord = true//设置以自动换行，以单词为整体，保证单词不会被切断
         val scrollPane1 = JScrollPane(textMessage)//设置滚动条
         scrollPane1.setBounds(135, 50, 340, 240)
         window.add(scrollPane1)
@@ -266,7 +266,7 @@ class WindowClient {
         lateinit var window: JFrame
         lateinit var link: JButton
         lateinit var exit: JButton
-        lateinit var textMessage: JTextArea
+        lateinit var textMessage: JTextPane
         var socket: Socket? = null
         lateinit var userJL: JList<String>
         lateinit var tmpDir: File

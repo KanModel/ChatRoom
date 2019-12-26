@@ -85,10 +85,10 @@ class ServerReceiver(private val socket: Socket) : Runnable {
                             val pre = "${SimpleDateFormat("HH:mm:ss").format(Date())} [$clientName]:"
                             chatQueue.offer(pre)
                             notEmpty.release()
-                            chatHistories.add(pre)
+//                            chatHistories.add(pre)
                             chatQueue.offer(line)
                             notEmpty.release()
-                            chatHistories.add(line)
+//                            chatHistories.add(line)//图片不存入聊天历史记录
                             ServerSender(pre, "1")//将信息转发给客户端
                             ServerSender(line, "5")//将信息转发给客户端
                         } catch (e: Exception) {
